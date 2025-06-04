@@ -31,33 +31,34 @@ def AFD(machine: Machine, string: list):
     currentSymbol = string.pop(0)
     
     while currentSymbol in machine.sigma:
-        if string == []:
-            break
-        
-        elif (qCurrent, epsilon, epsilon) in machine.delta :
+    
+        if (qCurrent, epsilon, epsilon) in machine.delta :
             # empty path
-            # printInfo(qCurrent, epsilon, stack, machine.delta, epsilon)
+            printInfo(qCurrent, epsilon, stack, machine.delta, epsilon)
             qCurrent, stackSymbol = machine.delta[(qCurrent, epsilon, epsilon)]
             addToStack(stack, stackSymbol)
             
         elif (qCurrent, currentSymbol, epsilon) in machine.delta:
             # path to add nothing to stack
-            # printInfo(qCurrent, currentSymbol, stack, machine.delta, epsilon)
+            printInfo(qCurrent, currentSymbol, stack, machine.delta, epsilon)
             qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, epsilon)]
             addToStack(stack, stackSymbol)
             currentSymbol = string.pop(0) if string else epsilon
             
-        elif (qCurrent, currentSymbol, stack[-1]) in machine.delta:
+        elif (qCurrent, currentSymbol, stack[-1] if len(stack) > 0 else '') in machine.delta:
             # path to add something to stack
-            # printInfo(qCurrent, currentSymbol, stack, machine.delta)
+            printInfo(qCurrent, currentSymbol, stack, machine.delta)
             qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, stack[-1])]
             removeFromStack(stack, stack[-1])
             addToStack(stack, stackSymbol)
             currentSymbol = string.pop(0) if string else epsilon
+        
+        elif string == []:
+            break
             
         else:
             break
-         
+        
     return qCurrent in machine.f
 
 
