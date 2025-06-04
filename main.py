@@ -94,9 +94,12 @@ def main ():
         
         if string == '/exit;': break
         
-        if AFD(machine, list(string)):
-            print("Accepted")
-        else:
+        try: 
+            if AFD(machine, list(string)):
+                print("Accepted")
+            else:
+                print("Rejected") 
+        except:
             print("Rejected")
     
     
