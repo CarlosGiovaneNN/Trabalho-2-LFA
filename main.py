@@ -31,8 +31,8 @@ def AFD(machine: Machine, string: list):
     currentSymbol = string.pop(0)
     
     while currentSymbol in machine.sigma:
-        if qCurrent in machine.f:
-            return True
+        if string == []:
+            break
         
         elif (qCurrent, epsilon, epsilon) in machine.delta :
             # empty path
@@ -56,9 +56,9 @@ def AFD(machine: Machine, string: list):
             currentSymbol = string.pop(0) if string else epsilon
             
         else:
-            return False    
+            break
          
-    return False
+    return qCurrent in machine.f
 
 
 def getMachine():
