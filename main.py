@@ -1,89 +1,103 @@
-def removeFromStack(stack, symbol):
-    if symbol != emp:
+epsilon = 'ε'
+
+class Machine:
+    def __init__(self, q, sigma, delta, q0, f):
+        self.q = q
+        self.sigma = sigma
+        self.delta = delta
+        self.q0 = q0
+        self.f = f
+
+def removeFromStack(stack: list, symbol: str):
+    if symbol != epsilon:
         stack.pop()
 
-def addToStack(stack, symbol):
-    if symbol != emp:
+def addToStack(stack: list, symbol: str):
+    if symbol != epsilon:
         stack.append(symbol)
+        
+def printInfo(qCurrent: str, currentSymbol: str, stack: list, delta: dict, epsilon: str = None):
+    print('\n-------------------\n')
+    print("Current symbol", currentSymbol)
+    print("Current state", qCurrent)
+    print("Current stack", stack)
+    print('Next State, Symbol to add', delta[(qCurrent, currentSymbol, stack[-1] if epsilon == None else epsilon)])
 
 
-def AFD(machine, string):
-    (q, sigma, delta, q0, f) = machine
-
+def AFD(machine: Machine, string: list):
+    
+    qCurrent = machine.q0
     stack = []
-    qNext= q0
-    
-    # for char in string:
-    #     qA= delta[(qA, char)]
-    # return qA in f
-    
     currentSymbol = string.pop(0)
-    while True:
-        if qNext in f:
+    
+    while currentSymbol in machine.sigma:
+        if qCurrent in machine.f:
             return True
         
-        elif (qNext, emp, emp) in delta :
+        elif (qCurrent, epsilon, epsilon) in machine.delta :
             # empty path
-            # print('\n-------------------')
-            # print("Current symbol", currentSymbol)
-            # print("Current state", qNext)
-            # print("Current stack", stack)
-            # print('Next State, Symbol to add', delta[(qNext, emp, emp)])
-            qNext, stackSymbol = delta[(qNext, emp, emp)]
+            # printInfo(qCurrent, epsilon, stack, machine.delta, epsilon)
+            qCurrent, stackSymbol = machine.delta[(qCurrent, epsilon, epsilon)]
             addToStack(stack, stackSymbol)
             
-        elif (qNext, currentSymbol, emp) in delta:
+        elif (qCurrent, currentSymbol, epsilon) in machine.delta:
             # path to add nothing to stack
-            # print('\n-------------------')
-            # print("Current symbol", currentSymbol)
-            # print("Current state", qNext)
-            # print("Current stack", stack)
-            # print('Next State, Symbol to add', delta[(qNext, currentSymbol, emp)])
-            qNext, stackSymbol = delta[(qNext, currentSymbol, emp)]
+            # printInfo(qCurrent, currentSymbol, stack, machine.delta, epsilon)
+            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, epsilon)]
             addToStack(stack, stackSymbol)
-            currentSymbol = string.pop(0) if string else emp
+            currentSymbol = string.pop(0) if string else epsilon
             
-        elif (qNext, currentSymbol, stack[-1]) in delta:
+        elif (qCurrent, currentSymbol, stack[-1]) in machine.delta:
             # path to add something to stack
-            # print('\n-------------------')
-            # print("Current symbol", currentSymbol)
-            # print("Current state", qNext)
-            # print("Current stack", stack)
-            # print('Next State, Symbol to add', delta[(qNext, currentSymbol, stack[-1])])
-            qNext, stackSymbol = delta[(qNext, currentSymbol, stack[-1])]
+            # printInfo(qCurrent, currentSymbol, stack, machine.delta)
+            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, stack[-1])]
             removeFromStack(stack, stack[-1])
             addToStack(stack, stackSymbol)
-            currentSymbol = string.pop(0) if string else emp
+            currentSymbol = string.pop(0) if string else epsilon
             
         else:
-            return False
-            
+            return False    
+         
+    return False
 
-emp = ''
 
-q = {'q0', 'q1', 'q2', 'q3', 'q4'}
-sigma = {'A', 'C', 'G', 'T', '#'}
+def getMachine():
+    q = {'q0', 'q1', 'q2', 'q3', 'q4'}
+    sigma = { epsilon, 'A', 'C', 'G', 'T', '#'}
 
-# CURRENT STATE - READ SYMBOL - SYMBOL TO REMOVE : NEXT STATE - SYMBOL TO ADD
-delta = {
-    ('q0', emp, emp): ['q1', '$'],
-    ('q1', 'C', emp): ['q1', emp],
-    ('q1', 'G', emp): ['q1', emp],
-    ('q1', 'A', 'T'): ['q1', emp],
-    ('q1', 'T', 'A'): ['q1', emp],
-    ('q1', 'A', 'A'): ['q2', 'A'],
-    ('q1', 'A', '$'): ['q2', '$'],
-    ('q1', 'T', 'T'): ['q3', 'T'],
-    ('q1', 'T', '$'): ['q3', '$'],
-    ('q1', '#', '$'): ['q4', emp],
-    ('q2', emp, emp): ['q1', 'A'],
-    ('q3', emp, emp): ['q1', 'T'],
-}
-q0 = 'q0'
-f = {'q4'}
+    # CURRENT STATE - READ SYMBOL - SYMBOL TO REMOVE : NEXT STATE - SYMBOL TO ADD
+    delta = {
+        ('q0', epsilon, epsilon): ['q1', '$'],
+        ('q1', 'C', epsilon): ['q1', epsilon],
+        ('q1', 'G', epsilon): ['q1', epsilon],
+        ('q1', 'A', 'T'): ['q1', epsilon],
+        ('q1', 'T', 'A'): ['q1', epsilon],
+        ('q1', 'A', 'A'): ['q2', 'A'],
+        ('q1', 'A', '$'): ['q2', '$'],
+        ('q1', 'T', 'T'): ['q3', 'T'],
+        ('q1', 'T', '$'): ['q3', '$'],
+        ('q1', '#', '$'): ['q4', epsilon],
+        ('q2', epsilon, epsilon): ['q1', 'A'],
+        ('q3', epsilon, epsilon): ['q1', 'T'],
+    }
+    q0 = 'q0'
+    f = {'q4'}
+    
+    return Machine(q, sigma, delta, q0, f)
+        
 
-machine = (q, sigma, delta, q0, f)
+def main ():
+    machine = getMachine()
 
-teste = ['A', 'G', 'C', 'T', '#']
-
-print(AFD(machine, list('AGCTT#')))
+    while True:
+        string = input("Enter a string: ")
+        
+        if string == '/exit;': break
+        
+        if AFD(machine, list(string)):
+            print("Accepted")
+        else:
+            print("Rejected")
+    
+    
+main ()
