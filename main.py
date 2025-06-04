@@ -45,7 +45,7 @@ def AFD(machine: Machine, string: list):
             addToStack(stack, stackSymbol)
             currentSymbol = string.pop(0) if string else epsilon
             
-        elif (qCurrent, currentSymbol, stack[-1] if len(stack) > 0 else '') in machine.delta:
+        elif (qCurrent, currentSymbol, stack[-1] if len(stack) > 0 else epsilon) in machine.delta:
             # path to add something to stack
             printInfo(qCurrent, currentSymbol, stack, machine.delta)
             qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, stack[-1])]
