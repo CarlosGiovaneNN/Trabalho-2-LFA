@@ -52,37 +52,40 @@ def AFD(machine: Machine, string: list):
             removeFromStack(stack, stack[-1])
             addToStack(stack, stackSymbol)
             currentSymbol = string.pop(0) if string else epsilon
-        
-        elif string == []:
-            break
             
         else:
             break
-        
+    
+    if(len(string) > 0): return False
+
     return qCurrent in machine.f
 
 
 def getMachine():
-    q = {'q0', 'q1', 'q2', 'q3', 'q4'}
+    q = {'q0', 'q1','q2', 'q3', 'q4', 'q5'}
     sigma = { epsilon, 'A', 'C', 'G', 'T', '#'}
 
     # CURRENT STATE - READ SYMBOL - SYMBOL TO REMOVE : NEXT STATE - SYMBOL TO ADD
     delta = {
         ('q0', epsilon, epsilon): ['q1', '$'],
-        ('q1', 'C', epsilon): ['q1', epsilon],
-        ('q1', 'G', epsilon): ['q1', epsilon],
-        ('q1', 'A', 'T'): ['q1', epsilon],
-        ('q1', 'T', 'A'): ['q1', epsilon],
-        ('q1', 'A', 'A'): ['q2', 'A'],
-        ('q1', 'A', '$'): ['q2', '$'],
-        ('q1', 'T', 'T'): ['q3', 'T'],
-        ('q1', 'T', '$'): ['q3', '$'],
-        ('q1', '#', '$'): ['q4', epsilon],
-        ('q2', epsilon, epsilon): ['q1', 'A'],
-        ('q3', epsilon, epsilon): ['q1', 'T'],
+        ('q1', 'A', epsilon): ['q3', epsilon],
+        ('q1', 'C', epsilon): ['q2', epsilon],
+        ('q1', 'G', epsilon): ['q2', epsilon],
+        ('q1', 'T', epsilon): ['q4', epsilon],
+        ('q2', 'C', epsilon): ['q2', epsilon],
+        ('q2', 'G', epsilon): ['q2', epsilon],
+        ('q2', 'A', 'T'): ['q2', epsilon],
+        ('q2', 'T', 'A'): ['q2', epsilon],
+        ('q2', 'A', 'A'): ['q3', 'A'],
+        ('q2', 'A', '$'): ['q3', '$'],
+        ('q2', 'T', 'T'): ['q4', 'T'],
+        ('q2', 'T', '$'): ['q4', '$'],
+        ('q2', '#', '$'): ['q5', epsilon],
+        ('q3', epsilon, epsilon): ['q2', 'A'],
+        ('q4', epsilon, epsilon): ['q2', 'T'],
     }
     q0 = 'q0'
-    f = {'q4'}
+    f = {'q5'}
     
     return Machine(q, sigma, delta, q0, f)
         
