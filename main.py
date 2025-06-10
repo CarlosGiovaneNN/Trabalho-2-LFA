@@ -26,38 +26,37 @@ def printInfo(qCurrent: str, currentSymbol: str, stack: list, delta: dict, epsil
 
 def AFD(machine: Machine, string: list):
     
-    qCurrent = machine.q0                                                                           # ESTADO INICIAL
-    stack = []                                                                                      # PILHA INICIA VAZIA
-    currentSymbol = string.pop(0)                                                                   # PEGA O PRIMERO SIMBOLO DA STRING E REMOVE DO ARRAYT
+    qCurrent = machine.q0                                                                          
+    stack = []                                                                                    
+    currentSymbol = string.pop(0)                                                                   
+    while currentSymbol in machine.sigma:                                                          
     
-    while currentSymbol in machine.sigma:                                                           # FAZ LOOP ENQUANTO A STRING NAO ESTIVER VAZIA OU FOR DIFERENTE DO ALFABETO
-    
-        if (qCurrent, epsilon, epsilon) in machine.delta:                                           # VERIFICA SE EXISTE UMA TRANSICAO SEM LER O SIMBOLO E COM NADA NA PILHA(SEM TIRAR NADA DA PILHA)
-            qCurrent, stackSymbol = machine.delta[(qCurrent, epsilon, epsilon)]                     # PEGA A PROXIMA TRANSICAO
-            addToStack(stack, stackSymbol)                                                          # ADICIONA O SIMBOLO NA PILHA
+        if (qCurrent, epsilon, epsilon) in machine.delta:                                           
+            qCurrent, stackSymbol = machine.delta[(qCurrent, epsilon, epsilon)]                   
+            addToStack(stack, stackSymbol)                                                        
             
-        elif (qCurrent, currentSymbol, epsilon) in machine.delta:                                   # VERIFICA SE EXISTE UMA TRANSICAO LENDO O SIMBOLO E COM NADA NA PILHA(SEM TIRAR NADA DA PILHA)
-            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, epsilon)]               # PEGA A PROXIMA TRANSICAO
-            addToStack(stack, stackSymbol)                                                          # ADICIONA O SIMBOLO NA PILHA
-            currentSymbol = string.pop(0) if string else epsilon                                    # COLOCA O PROXIMO SIMBOLO, CASO TENHA ALGO PARA TIRAR TIRA SE NAO DEIXA COM EPSILON
+        elif (qCurrent, currentSymbol, epsilon) in machine.delta:                             
+            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, epsilon)]            
+            addToStack(stack, stackSymbol)                                                          
+            currentSymbol = string.pop(0) if string else epsilon                                    
             
-        elif (qCurrent, currentSymbol, stack[-1] if len(stack) > 0 else epsilon) in machine.delta:  # VERIFICA SE EXISTE UMA TRANSICAO LENDO O SIMBOLO E COM ALGO NO TOPO DA PILHA E RETIRANDO
-            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, stack[-1])]             # PEGA A PROXIMA TRANSICAO
-            removeFromStack(stack, stack[-1])                                                       # REMOVE O SIMBOLO NA PILHA
-            addToStack(stack, stackSymbol)                                                          # ADICIONA O SIMBOLO NA PILHA
-            currentSymbol = string.pop(0) if string else epsilon                                    # COLOCA O PROXIMO SIMBOLO, CASO TENHA ALGO PARA TIRAR TIRA SE NAO DEIXA COM EPSILON
+        elif (qCurrent, currentSymbol, stack[-1] if len(stack) > 0 else epsilon) in machine.delta:  
+            qCurrent, stackSymbol = machine.delta[(qCurrent, currentSymbol, stack[-1])]             
+            removeFromStack(stack, stack[-1])                                                      
+            addToStack(stack, stackSymbol)                                                         
+            currentSymbol = string.pop(0) if string else epsilon                                   
             
         else:
             break
     
-    if(len(string) > 0 or currentSymbol != epsilon): return False                                   # SE A STRING NAO ESTIVER VAZIA OU O SIMBOLO FOR DIFERENTE DE EPSILON RETORNA FALSO
-
-    return qCurrent in machine.f                                                                    # VERIFICA SE O ESTADO ATUAL ESTA NO FINAL
+    if(len(string) > 0 or currentSymbol != epsilon): return False                                   
+    
+    return qCurrent in machine.f                                                                    
 
 
 def getMachine():
-    q = {'q0', 'q1','q2', 'q3', 'q4', 'q5'}             # ESTADOS
-    sigma = { epsilon, 'A', 'C', 'G', 'T', '#'}         # ALFABETO
+    q = {'q0', 'q1','q2', 'q3', 'q4', 'q5'}             
+    sigma = { epsilon, 'A', 'C', 'G', 'T', '#'}       
 
     # CURRENT STATE - READ SYMBOL - SYMBOL TO REMOVE : NEXT STATE - SYMBOL TO ADD
     delta = {
@@ -77,25 +76,25 @@ def getMachine():
         ('q2', '#', '$'): ['q5', epsilon],
         ('q3', epsilon, epsilon): ['q2', 'A'],
         ('q4', epsilon, epsilon): ['q2', 'T'],
-    }                                                   # TRANSICOES
-    q0 = 'q0'                                           # ESTADO INICIAL
-    f = {'q5'}                                          # ESTADOS FINAIS
+    }                                                   
+    q0 = 'q0'                                           
+    f = {'q5'}
     
     return Machine(q, sigma, delta, q0, f)
         
 
 def main ():
-    machine = getMachine()                              # CONFIGURA A MAQUINA
+    machine = getMachine()
 
     while True:
-        string = input("Enter a string: ")              # RECEBE A STRING
+        string = input("Enter a string: ") 
         
-        if string == '/exit;': break                    # SAIDA
+        if string == '/exit;': break 
         
-        try:                                            # TRY CATCH USADO PARA ALGUM ERRO NO STACK PARA NAO PARAR O PROGRAMA
-            if AFD(machine, list(string)):              # SE A STRING FOR ACEITA
+        try:                                         
+            if AFD(machine, list(string)):             
                 print("Accepted")
-            else:                                       # SE A STRING FOR REJEITADA
+            else:                                     
                 print("Rejected") 
         except:
             print("Rejected")
